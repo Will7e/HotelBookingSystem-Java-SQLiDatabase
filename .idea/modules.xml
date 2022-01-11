@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BookingApp/BookingApp.iml" filepath="$PROJECT_DIR$/BookingApp/BookingApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/HotelBookingSystem.iml" filepath="$PROJECT_DIR$/.idea/HotelBookingSystem.iml" />
+    </modules>
+  </component>
+</project>
