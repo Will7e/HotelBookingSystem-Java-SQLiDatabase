@@ -21,7 +21,7 @@ public class DataService {
         }
     }
 
-    
+
     // Add data to company table. Return id
     public int createCompany(String companyName) {
         int createdId = 0;
@@ -47,10 +47,10 @@ public class DataService {
     // Get a view on what amenities the hotel has.
     public void viewAmenities(int hotelId) {
         String query = "SELECT Amenity_Info.Amenity_ID, Hotel.Hotel_ID, Hotel.Hotel_Name, Description FROM Amenity_Info\n" +
-                "INNER JOIN Hotel \n" +
-                "INNER JOIN Amenity \n" +
+                "INNER JOIN Hotel ON Hotel.Hotel_ID = Amenity.Hotel_ID\n" +
+                "INNER JOIN Amenity ON Amenity.Amenity_ID = Amenity_Info.Amenity_ID\n" +
                 "WHERE Hotel.Hotel_ID = '" + hotelId + "'\n" +
-                "GROUP BY Hotel.Hotel_Name ";
+                "GROUP BY Amenity_Info.Description ";
         try {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -68,8 +68,8 @@ public class DataService {
 
     // Create customer in database
     public int createCustomer(int companyID, String fistName, String lastName, String address,
-                               String city, String country, String phoneNumber, String email,
-                               String birthday) {
+                              String city, String country, String phoneNumber, String email,
+                              String birthday) {
         int customerId = 0;
         String query = "INSERT INTO Customer(First_Name, Last_Name, Address, City, Country, PhoneNumber, Email, Birthday, Company_ID)\n" +
                 "VALUES (?,?,?,?,?,?,?,?,?);";
@@ -117,55 +117,59 @@ public class DataService {
     }
 
     // Find available room by room size and check in check out date
-    public boolean findAvailableRoom(int roomSize, String checkInDate,String hotelCity, String checkOutDate) {
-            boolean isEmpty = true;
-            String query = "SELECT Room.Room_ID, Room.Room_Name, Room.Room_Size, Hotel.Hotel_ID, Hotel.Hotel_Name, Hotel.City, Hotel.Country FROM Room \n" +
-                    "LEFT JOIN Calendar ON Room.Room_ID = Calendar.Room_ID \n" +
-                    "INNER JOIN Hotel ON Hotel.Hotel_ID = Room.Hotel_ID\n" +
-                    "WHERE  Room.Room_Size = ? AND Hotel.City = ? AND Calendar.CheckOut_Date <= ?\n" +
-                    "OR Room.Room_Size = ? AND Hotel.City = ? AND Calendar.CheckIn_Date >= ?\n" +
-                    "OR Room.Room_Size = ? AND Hotel.City = ? AND Calendar.Calendar_ID IS NULL\n \n";
-            try {
-                PreparedStatement statement = con.prepareStatement(query);
-                // ? parameter id
-                statement.setInt(1, roomSize);
-                statement.setString(2, hotelCity);
-                statement.setString(3, checkOutDate);
-                statement.setInt(4, roomSize);
-                statement.setString(5, hotelCity);
-                statement.setString(6, checkInDate);
-                statement.setInt(7,roomSize);
-                statement.setString(8,hotelCity);
-                ResultSet resultSet = statement.executeQuery();
+    public boolean findAvailableRoom(int roomSize, String checkInDate, int hotelId, String checkOutDate) {
+        boolean isEmpty = true;
+        String query = "SELECT Room.Room_ID, Room.Room_Name, Room.Room_Size, Hotel.Hotel_ID, Hotel.Hotel_Name, " +
+                "Hotel.City, Hotel.Country,Room.Price FROM Room \n" +
+                "LEFT JOIN Calendar ON Room.Room_ID = Calendar.Room_ID \n" +
+                "INNER JOIN Hotel ON Hotel.Hotel_ID = Room.Hotel_ID\n" +
+                "WHERE  Room.Room_Size = ? AND Hotel.Hotel_ID = ? AND Calendar.CheckOut_Date <= ?\n" +
+                "OR Room.Room_Size = ? AND Hotel.Hotel_ID = ? AND Calendar.CheckIn_Date >= ?\n" +
+                "OR Room.Room_Size = ? AND Hotel.Hotel_ID = ? AND Calendar.Calendar_ID IS NULL\n" +
+                "GROUP BY Room.Room_ID\n" +
+                "ORDER BY Room.Price ASC";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            // ? parameter id
+            statement.setInt(1, roomSize);
+            statement.setInt(2, hotelId);
+            statement.setString(3, checkOutDate);
+            statement.setInt(4, roomSize);
+            statement.setInt(5, hotelId);
+            statement.setString(6, checkInDate);
+            statement.setInt(7, roomSize);
+            statement.setInt(8, hotelId);
+            ResultSet resultSet = statement.executeQuery();
 
 
-                while (resultSet.next()) {
-                    System.out.println("RoomId   RoomName   RoomSize    HotelId      HotelName        City       Country");
-                    isEmpty = false;
-                    // vi behöver nu hämta ut varje värde från varje kolumn i raden:
-                    int roomID = resultSet.getInt("Room_ID");
-                    String roomName = resultSet.getString("Room_Name");
-                    int roomSize1 = resultSet.getInt("Room_Size");
-                    String hotelID = resultSet.getString("Hotel_ID");
-                    String hotelName = resultSet.getString("Hotel_Name");
-                    String city = resultSet.getString("City");
-                    String country = resultSet.getString("Country");
-                    System.out.println(roomID + "          " + roomName + "        " + roomSize1 + "            " + hotelID + "        " +
-                            "" + hotelName + "      " + city + "      " + country +"\n");
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            while (resultSet.next()) {
+                System.out.println("RoomId   RoomName   RoomSize    HotelId      HotelName        City       Country     Price");
+                isEmpty = false;
+                // vi behöver nu hämta ut varje värde från varje kolumn i raden:
+                int roomID = resultSet.getInt("Room_ID");
+                String roomName = resultSet.getString("Room_Name");
+                int roomSize1 = resultSet.getInt("Room_Size");
+                String hotelID = resultSet.getString("Hotel_ID");
+                String hotelName = resultSet.getString("Hotel_Name");
+                String city = resultSet.getString("City");
+                String country = resultSet.getString("Country");
+                int price = resultSet.getInt("Price");
+                System.out.println(roomID + "          " + roomName + "        " + roomSize1 + "            " + hotelID + "        " +
+                        "" + hotelName + "      " + city + "      " + country + "       " + price);
             }
-            if (isEmpty){
-                System.out.println("No room available.");
-                return false;
-            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        if (isEmpty) {
+            System.out.println("No room available.");
+            return false;
+        }
 
         return true;
     }
 
     // Create booking on sqlite database. Return booking id
-    public int createBooking(int calendarId, int customerId) {
+    public int createBooking(int customerId, int calendarId) {
         int bookingId = 0;
         String query = "INSERT INTO Booking(Customer_ID,Calendar_ID) VALUES(?,?)";
         try {
@@ -285,25 +289,19 @@ public class DataService {
         return rooms;
     }
 
-    public void viewBooking(int customerId) {
+    public boolean viewBookingById(int id, String appUiQuery) {
         int bookingId, calendarId;
-        String query = "SELECT Customer.First_Name, Customer.Last_Name, Booking.Booking_ID, Calendar.Calendar_ID, Calendar.Room_ID, Room.Room_Name, Hotel.Hotel_Name, Calendar.CheckIn_Date, Calendar.CheckOut_Date \n" +
-                "FROM Booking \n" +
-                "INNER JOIN Customer ON Customer.Customer_ID = Booking.Customer_ID \n" +
-                "INNER JOIN Calendar ON Calendar.Calendar_ID = Booking.Calendar_ID \n" +
-                "INNER JOIN Room ON Room.Room_ID = Calendar.Room_ID \n" +
-                "INNER JOIN Hotel ON Hotel.Hotel_ID = Room.Hotel_ID \n" +
-                "WHERE Customer.Customer_ID = ?";
+
         try {
-            PreparedStatement statement = con.prepareStatement(query);
-            statement.setInt(1, customerId);
+            PreparedStatement statement = con.prepareStatement(appUiQuery);
+            statement.setInt(1, id);
             // commit to database
             // get result
             ResultSet resultSet = statement.executeQuery();
-            System.out.println("First Name     Last Name      BookingID    CalendarID    RoomID" +
-                    "    Room Name    Hotel Name      Check In    Check Out   ");
 
             while (resultSet.next()) {
+                System.out.println("First Name     Last Name      BookingID    CalendarID    RoomID" +
+                        "    Room Name    Hotel Name      Check In       Check Out   ");
                 String firstName = resultSet.getString("First_Name");
                 String lastName = resultSet.getString("Last_Name");
                 bookingId = resultSet.getInt("Booking_ID");
@@ -317,16 +315,18 @@ public class DataService {
 
                 System.out.println(firstName + "" +
                         "       " +
-                        "  " + lastName + "    " +
-                        "       " + bookingId + "    " + calendarId + "    " +
-                        "" + roomId + "    " + roomName + "    " + hotelName + "" +
-                        " " + checkIn + " " + checkOut);
+                        "   " + lastName + "    " +
+                        "       " + bookingId + "            " + calendarId + "    " +
+                        "        " + roomId + "         " + roomName + "         " + hotelName + "" +
+                        "       " + checkIn + "     " + checkOut);
+
+                return false;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        return true;
     }
 
     public void deleteBooking(int bookingId, int calendarId) {
@@ -334,20 +334,42 @@ public class DataService {
         String query2 = "DELETE FROM Calendar WHERE Calendar.Calendar_ID = ?";
         try {
             PreparedStatement statement = con.prepareStatement(query);
-            statement.setInt(1,bookingId);
+            statement.setInt(1, bookingId);
             PreparedStatement statement2 = con.prepareStatement(query2);
-            statement2.setInt(1,calendarId);
+            statement2.setInt(1, calendarId);
             // ? parameter id
             statement.executeUpdate();
             statement2.executeUpdate();
-
-            System.out.println("Delete succeed");
+            System.out.println("Booking with BookingID : " + bookingId + " CalendarID: " + calendarId + "\nHas been canceled.");
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
     }
+
+    public void viewHotelPrice(int hotelId, String appUiQuery) {
+        try {
+            PreparedStatement statement = con.prepareStatement(appUiQuery);
+            ResultSet resultSet = statement.executeQuery();
+
+            System.out.println("Hotel ID     Hotel Name      Room ID     Room Size     Price");
+            while (resultSet.next()) {
+                // vi behöver nu hämta ut varje värde från varje kolumn i raden:
+                String hotelName = resultSet.getString("Hotel_Name");
+                int roomId = resultSet.getInt("Room_ID");
+                int roomSize = resultSet.getInt("Room_Size");
+                int price = resultSet.getInt("Price");
+
+                System.out.println(hotelId+"           " + hotelName + "        " + roomId + "             "+roomSize+"           "+price);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+
 }
 
 

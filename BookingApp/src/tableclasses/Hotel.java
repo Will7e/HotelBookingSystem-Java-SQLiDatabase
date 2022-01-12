@@ -6,7 +6,7 @@ public class Hotel {
     public String city;
     public String country;
     public int distanceToBeach;
-    public int getDistanceToCenter;
+    public int distanceToCenter;
 
     public Hotel(int hotelId, String name, String city, String country, int distanceToBeach, int getDistanceToCenter) {
         this.hotelId = hotelId;
@@ -14,6 +14,6 @@ public class Hotel {
         this.city = city;
         this.country = country;
         this.distanceToBeach = distanceToBeach;
-        this.getDistanceToCenter = getDistanceToCenter;
+        this.distanceToCenter = getDistanceToCenter;
     }
 }

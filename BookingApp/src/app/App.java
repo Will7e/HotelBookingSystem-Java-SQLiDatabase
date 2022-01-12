@@ -14,7 +14,8 @@ public class App {
     DataService dataService;
     ArrayList<Company> companies;
     ArrayList<Customer> customers;
-    AppControl appUI;
+    AppControl appControl;
+    AppUI appUI;
     ArrayList<Hotel> hotels;
     ArrayList<Room> rooms;
 
@@ -22,13 +23,15 @@ public class App {
     public App() {
         dataService = new DataService();
         dataService.connect();
-        appUI = new AppControl();
+        appControl = new AppControl();
+        appUI = new AppUI();
         scanner = new Scanner(System.in);
         companies = dataService.getCompany();
         customers = dataService.getCustomer();
         hotels = dataService.getHotel();
         rooms = dataService.getRoom();
-        appUI.startMenu(scanner,dataService,hotels,companies,customers);
+        appUI.introPrint();
+        appControl.startMenu(scanner,dataService,hotels,companies,customers,appUI,rooms);
 
     }
 
