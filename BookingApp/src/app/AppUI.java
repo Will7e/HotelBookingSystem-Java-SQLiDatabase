@@ -29,7 +29,7 @@ public class AppUI {
         System.out.println("[1]Search by customer ID\n[2].Search by name \n[3].Search by phone number\n[4].Search by emails \n[5].Return to main display\n");
     }
     public void askRoomSizePrint(){
-        System.out.println("Hotels has 3 room sizes. \n[2] [3] and [4]");
+        System.out.println("Hotels has 3 room sizes. \n[2] [3] and [4]\n");
         System.out.println("Which room size does customer wants?\n");
     }
 
