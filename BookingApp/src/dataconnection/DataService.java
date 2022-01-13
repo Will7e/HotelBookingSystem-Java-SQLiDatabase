@@ -54,12 +54,13 @@ public class DataService {
         try {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            System.out.println("Hotel ID      Hotel Name     Amenity ID      Description");
             while (resultSet.next()) {
                 // vi behöver nu hämta ut varje värde från varje kolumn i raden:
                 String title = resultSet.getString("Hotel_Name");
                 int amenityId = resultSet.getInt("Amenity_ID");
                 String description = resultSet.getString("Description");
-                System.out.println(hotelId + " || " + title + " || " + amenityId + " || " + description);
+                System.out.println(hotelId + "             " + title + "         " + amenityId + "        " + description);
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -90,7 +91,7 @@ public class DataService {
             while (keys.next()) {
                 customerId = keys.getInt(1);
             }
-            System.out.println("Customer " + fistName + " " + lastName + " " + customerId + " added.");
+            System.out.println("[Customer ADDED!]. Customer ID: " + customerId + " .Customer name: " + fistName+" "+lastName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -313,12 +314,9 @@ public class DataService {
                 String checkOut = resultSet.getString("CheckOut_Date");
 
 
-                System.out.println(firstName + "" +
-                        "       " +
-                        "   " + lastName + "    " +
-                        "       " + bookingId + "            " + calendarId + "    " +
-                        "        " + roomId + "         " + roomName + "         " + hotelName + "" +
-                        "       " + checkIn + "     " + checkOut);
+                System.out.println("  "+firstName + "       "  + lastName + "           "
+                        + bookingId + "               " + calendarId + "        "  + roomId + "         " + roomName + "         " + hotelName + "    " +
+                        checkIn + "    " + checkOut+"\n");
 
                 return false;
             }
@@ -340,7 +338,7 @@ public class DataService {
             // ? parameter id
             statement.executeUpdate();
             statement2.executeUpdate();
-            System.out.println("Booking with BookingID : " + bookingId + " CalendarID: " + calendarId + "\nHas been canceled.");
+            System.out.println("Booking with BookingID : " + bookingId + " has been canceled.\n");
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();

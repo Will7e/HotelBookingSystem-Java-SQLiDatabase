@@ -110,8 +110,6 @@ public class AppControl {
         boolean check = findAvailableRoom(scanner, dataService, hotels, companies, customers, appUI, rooms);
         System.out.println();
         if (check) {
-            // Can add option method here...
-
             System.out.println("Accept booking...\n[1].Yes\n[2].No\n");
             int input = Integer.parseInt(scanner.nextLine());
             switch (input) {
@@ -151,7 +149,7 @@ public class AppControl {
         int calendarId = createCalendar(dataService, roomId);
         bookingId = dataService.createBooking(calendarId, customerId);
         addBookingOptions(bookingId, scanner, dataService);
-        appUI.bookingCreatedMess(customerId, bookingId, customers);
+        appUI.bookingCreatedMess(customerId, bookingId, customers,dataService);
 
     }
 
@@ -172,16 +170,18 @@ public class AppControl {
             searchCustomers(scanner, companies, customers, appUI, dataService, hotels, rooms);
         } else {
             switch (input) {
-                case 1:
-                    viewBookingByBookingId(scanner, dataService, appUI, companies, customers, hotels, rooms);
+                case 1:appUI.viewBookingByCustomerId(scanner,dataService);
                     break;
                 case 2:
-                    searchCustomerByCompany(scanner, companies, customers, dataService, hotels, appUI, rooms);
+                    viewBookingByBookingId(scanner, dataService, appUI, companies, customers, hotels, rooms);
                     break;
                 case 3:
-                    searchCustomerByInfo(scanner, customers, appUI, dataService, hotels, companies, rooms);
+                    searchCustomerByCompany(scanner, companies, customers, dataService, hotels, appUI, rooms);
                     break;
                 case 4:
+                    searchCustomerByInfo(scanner, customers, appUI, dataService, hotels, companies, rooms);
+                    break;
+                case 5:
                     break;
             }
 
@@ -370,11 +370,11 @@ public class AppControl {
     public void deleteBooking(DataService dataService, Scanner scanner, ArrayList<Company> companies,
                               ArrayList<Customer> customers, AppUI appUI, ArrayList<Hotel> hotels, ArrayList<Room> rooms) {
         searchCustomers(scanner, companies, customers, appUI, dataService, hotels, rooms);
-        System.out.print("Calendar ID -> : ");
+        System.out.print("[Cancel booking]\nCalendar ID -> : ");
         int calendarId = Integer.parseInt(scanner.nextLine());
         System.out.print("Booking ID -> : ");
         int bookingId = Integer.parseInt(scanner.nextLine());
-        System.out.println("[1].Yes[Cancel Booking]\n[2].Return main display ");
+        System.out.println("[1].Yes[Cancel Booking]\n[2].Return main display\n");
         int input = Integer.parseInt(scanner.nextLine());
         if (input < 1 || input > 2) {
             appUI.inCorrectInput(1, 2);
@@ -393,7 +393,7 @@ public class AppControl {
 
 
     public void addCustomerMenu(Scanner scanner, DataService dataService, ArrayList<Company> companies, ArrayList<Customer> customers, AppUI appUI) {
-        System.out.println("[1].Add customers\n[2].Return main display.");
+        System.out.println("[1].Add customers\n[2].Return main display\n");
         int input = Integer.parseInt(scanner.nextLine());
         if (input < 1 || input > 2) {
             appUI.inCorrectInput(1, 2);
@@ -420,7 +420,7 @@ public class AppControl {
 
         addBookingOptions(bookingId, scanner, dataService);
 
-        appUI.bookingCreatedMess(customerId, bookingId, customers);
+        appUI.bookingCreatedMess(customerId, bookingId, customers,dataService);
     }
 
 
@@ -432,7 +432,7 @@ public class AppControl {
         bookingId = Integer.parseInt(scanner.nextLine());
         boolean check = dataService.viewBookingById(bookingId, appUI.queryViewByBookingId());
         if (check) {
-            System.out.println("No booking found with this Booking ID. Return main display...");
+            System.out.println("No booking found with this Booking ID. Return main display...\n");
             startMenu(scanner, dataService, hotels, companies, customers, appUI, rooms);
         }
     }
@@ -473,7 +473,7 @@ public class AppControl {
     public void priceOrder(Scanner scanner, DataService dataService, AppUI appUI, int hotelId) {
         String lowToHigh = "ASC";
         String highToLow = "DESC";
-        System.out.println("[1].Price low to high \n[2].Price high to low");
+        System.out.println("[1].Price low to high \n[2].Price high to low\n");
         int input = Integer.parseInt(scanner.nextLine());
         switch (input) {
             case 1:
@@ -486,7 +486,7 @@ public class AppControl {
     }
 
     public void hotelDistance(ArrayList<Hotel> hotels, Scanner scanner, AppUI appUI) {
-        System.out.println("[1].Distance to beach\n[2].Distance to center");
+        System.out.println("[1].Distance to beach\n[2].Distance to center\n");
         int input = Integer.parseInt(scanner.nextLine());
         System.out.print("Distance (meter) -> :");
         int distance = Integer.parseInt(scanner.nextLine());
@@ -528,7 +528,7 @@ public class AppControl {
 
     public void addBookingOptions(int bookingId, Scanner scanner, DataService dataService) {
         {
-            System.out.println("Options:\n[1].Add extra bed\n[2].No");
+            System.out.println("Extra booking's options:\n[1].Add extra bed\n[2].No\n");
             int input = Integer.parseInt(scanner.nextLine());
             switch (input) {
                 case 1:
@@ -545,7 +545,7 @@ public class AppControl {
 
     public void addMeals(int bookingId, Scanner scanner, DataService dataService) {
         {
-            System.out.println("[1].Add 2 meals\n[2].Add 3 meals\n[3].No");
+            System.out.println("[1].Add 2 meals\n[2].Add 3 meals\n[3].No\n");
             int input = Integer.parseInt(scanner.nextLine());
             switch (input) {
                 case 1:
@@ -597,7 +597,7 @@ public class AppControl {
         int bookingId = dataService.createBooking(customerId, calendarId);
 
         addBookingOptions(bookingId, scanner, dataService);
-        appUI.bookingCreatedMess(customerId, bookingId, customers);
+        appUI.bookingCreatedMess(customerId, bookingId, customers,dataService);
         startMenu(scanner, dataService, hotels, companies, customers, appUI, rooms);
     }
 
@@ -644,7 +644,7 @@ public class AppControl {
                                 DataService dataService, ArrayList<Hotel> hotels, AppUI appUI, ArrayList<Room> rooms) {
         searchCustomerByCompany(scanner, companies, customers, dataService, hotels, appUI, rooms);
         dataService.countCustomerInCompany(id);
-        System.out.println("Delete customer from company:\n[1].Yes\n[2].No");
+        System.out.println("Delete customer from company:\n[1].Yes\n[2].No\n");
         int input = Integer.parseInt(scanner.nextLine());
         if (input < 1 || input > 2) {
             appUI.inCorrectInput(1, 2);

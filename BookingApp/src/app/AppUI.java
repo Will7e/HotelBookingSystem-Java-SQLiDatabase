@@ -14,7 +14,7 @@ public class AppUI {
     }
     public void menuChoicePrint(){
         System.out.println("[1].Book Hotel\n[2].Delete Booking\n[3].Informations Search\n" +
-                "[4].Change Customer Infos\n[5].Add Company(Customer)\n[6].Edit Company\n[7].View/Add/Edit Booking's Options\n[8].Exit");
+                "[4].Change Customer Infos\n[5].Add Company(Customer)\n[6].Edit Company\n[7].View/Add/Edit Booking's Options\n[8].Exit\n");
     }
 
     public void hotelAvailablePrint(ArrayList<Hotel> hotels, ArrayList<Room>rooms){
@@ -26,16 +26,16 @@ public class AppUI {
         }
     }
     public void searchCustomerChoicePrint(){
-        System.out.println("[1]Search by customer ID\n[2].Search by name \n[3].Search by phone number\n[4].Search by emails \n[5].Return to main display");
+        System.out.println("[1]Search by customer ID\n[2].Search by name \n[3].Search by phone number\n[4].Search by emails \n[5].Return to main display\n");
     }
     public void askRoomSizePrint(){
         System.out.println("Hotels has 3 room sizes. \n[2] [3] and [4]");
-        System.out.println("Which room size does customer wants?");
+        System.out.println("Which room size does customer wants?\n");
     }
 
-    public void bookingCreatedMess(int customerId,int bookingId,ArrayList<Customer> customers){
-        String name = getCustomerNameById(customers,customerId);
-        System.out.println("Thank you "+ name + ",for booking. Here is Booking ID: "+ bookingId);
+    public void bookingCreatedMess(int customerId,int bookingId,ArrayList<Customer> customers,DataService dataService){
+        System.out.println("Thank you for booking. Here is your booking informations:\n");
+        dataService.viewBookingById(bookingId,queryViewByBookingId());
     }
     public void checkInDateText(){
         System.out.println("Check in date ->:");
@@ -47,7 +47,7 @@ public class AppUI {
     }
 public void calendarInputErrorMess(){
     System.out.println("Our booking calendar is only available for Juni and July\n" +
-            "Error?. Months digit need to be 06 or 07.  ");
+            "Error?. Months digit need to be 06 or 07.\n");
 
 }
 public int fyllCustomerInfo(int i, DataService dataService, Scanner scanner,int companyId){
@@ -72,7 +72,7 @@ public int fyllCustomerInfo(int i, DataService dataService, Scanner scanner,int 
 }
 
 public void inCorrectInput(int i, int j){
-    System.out.println("Incorrect input. [Correct "+ i +" -> " + j+"]");
+    System.out.println("Incorrect input. [Correct "+ i +" -> " + j+"]\n");
 
 }
 public String checkInAndOut(Scanner scanner){
@@ -100,9 +100,13 @@ public String checkInAndOut(Scanner scanner){
 }
     public void viewBookingByCustomerId(Scanner scanner,DataService dataService){
         int customerId;
-        System.out.print("Type in customer id to find booking: ");
+        System.out.print("[Find booking infos] Customer ID ->: ");
         customerId = Integer.parseInt(scanner.nextLine());
-        dataService.viewBookingById(customerId, queryViewByCustomerId());
+       boolean check = dataService.viewBookingById(customerId, queryViewByCustomerId());
+        System.out.println();
+       if (check){
+           System.out.println("Booking not found by this customer ID\n");
+       }
 
     }
 
@@ -146,7 +150,7 @@ public String checkInAndOut(Scanner scanner){
     }
 
     public void searchCustomerMenuChoice(){
-        System.out.println("[1].Search by booking ID\n[2].Search by company infos \n[3].Search by customer infos\n[4].Return main display");
+        System.out.println("[1].Search booking by customer ID\n[2].Search by booking ID\n[3].Search by company infos \n[4].Search by customer infos\n[5].Return main display\n");
     }
     public void changeName(Scanner scanner,DataService dataService){
         System.out.print("Customer ID ->: ");
@@ -183,7 +187,7 @@ public String checkInAndOut(Scanner scanner){
         return Integer.parseInt(scanner.nextLine());
     }
     public void optionsChoice(){
-        System.out.println("[1].Extra bed\n[2].Add 2 meals\n[3].Add 3 meals");
+        System.out.println("[1].Extra bed\n[2].Add 2 meals\n[3].Add 3 meals\n");
     }
 }
 
