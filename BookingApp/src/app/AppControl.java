@@ -441,7 +441,7 @@ public class AppControl {
                               ArrayList<Hotel> hotels, ArrayList<Company> companies, ArrayList<Customer> customers,
                               AppUI appUI, ArrayList<Room> rooms) {
         int hotelId, input;
-        System.out.println("[1].Continue to book\n[2].Check Hotel amenities\n[3].Check prices\n[4].Search by distans\n[5].Return main display");
+        System.out.println("[1].Continue to book\n[2].Check Hotel amenities\n[3].Check prices\n[4].Search by distance\n[5].Return main display");
         input = Integer.parseInt(scanner.nextLine());
         if (input < 1 || input > 5) {
             appUI.inCorrectInput(1, 5);
