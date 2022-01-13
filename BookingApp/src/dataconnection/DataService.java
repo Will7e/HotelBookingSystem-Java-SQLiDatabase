@@ -351,6 +351,7 @@ public class DataService {
     public void viewHotelPrice(int hotelId, String appUiQuery) {
         try {
             PreparedStatement statement = con.prepareStatement(appUiQuery);
+            statement.setInt(1, hotelId);
             ResultSet resultSet = statement.executeQuery();
 
             System.out.println("Hotel ID     Hotel Name      Room ID     Room Size     Price");
@@ -361,16 +362,202 @@ public class DataService {
                 int roomSize = resultSet.getInt("Room_Size");
                 int price = resultSet.getInt("Price");
 
-                System.out.println(hotelId+"           " + hotelName + "        " + roomId + "             "+roomSize+"           "+price);
+                System.out.println(hotelId + "           " + hotelName + "        " + roomId + "             " + roomSize + "         " + price);
             }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        System.out.println();
+
+    }
+
+    public void addOption(int optionId, int bookingId) {
+        String query = "INSERT INTO Option(Option_ID,Booking_ID) VALUES(?,?)";
+
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, optionId);
+            statement.setInt(2, bookingId);
+            // commit to database
+            statement.executeUpdate();
+            // get result
+            String description = getOptionDescription(optionId);
+            System.out.println("Option : " + description +" has added to Booking ID: "+ bookingId+".\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateName(String firstName, String lastName, int customerId) {
+        String query = "UPDATE Customer\n" +
+                "Set First_Name = ?,\n" +
+                "Last_Name = ?\n" +
+                "WHERE Customer_ID = ?";
+
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setString(1, firstName);
+            statement.setString(2, lastName);
+            statement.setInt(3, customerId);
+            // commit to database
+            statement.executeUpdate();
+            System.out.println("Name updated: " + firstName + " " + lastName + "\n");
+            // get result
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateAdress(String address, String city, String country, int customerId) {
+        String query = "UPDATE Customer\n" +
+                "Set Address = ?,\n" +
+                "City =?,\n" +
+                "Country = ?\n" +
+                "WHERE Customer_ID = ?";
+
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setString(1, address);
+            statement.setString(2, city);
+            statement.setString(3, country);
+            statement.setInt(4, customerId);
+            // commit to database
+            statement.executeUpdate();
+            // get result
+            System.out.println("Address updated: " + address + " " + city + " " + country + "\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updatePhoneNumbersOrEmail(String co, String info, int customerId) {
+        String query = "UPDATE Customer\n" +
+                "Set '" + co + "' = ?\n" +
+                "WHERE Customer_ID = ?\n" +
+                "\n";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setString(1, info);
+            statement.setInt(2, customerId);
+            // commit to database
+            statement.executeUpdate();
+            System.out.println(co + " updated: " + info + "\n");
+            // get result
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void countCustomerInCompany(int companyId) {
+        String query = "SELECT COUNT(Company.Company_ID) as Count_Customer,Company.Company_Name FROM Company\n" +
+                "INNER JOIN Customer ON Company.Company_ID = Customer.Company_ID\n" +
+                "WHERE Company.Company_ID = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, companyId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                // vi behöver nu hämta ut varje värde från varje kolumn i raden:
+                int count = resultSet.getInt("Count_Customer");
+                String companyName = resultSet.getString("Company_Name");
+                System.out.println("Company name: " + companyName + " has " + count + " customers.\n");
+            }
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
     }
 
+    public void deleteCustomer(int customerId) {
+        String query = "DELETE FROM Customer\n" +
+                "WHERE Customer.Customer_ID = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, customerId);
+            statement.executeUpdate();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 
+    }
+
+    public boolean viewBookingOptions(int bookingId) {
+        String query = "SELECT Option.Option_ID,Booking.Booking_ID,Booking.Customer_ID,Booking.Calendar_ID,Option_Info.Description FROM Option\n" +
+                "INNER JOIN Booking ON Booking.Booking_ID = Option.Booking_ID\n" +
+                "INNER JOIN Option_Info ON Option.Option_ID = Option_Info.Option_ID\n" +
+                "WHERE Booking.Booking_ID = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, bookingId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                System.out.println("Option ID    Booking ID    Description");
+                // vi behöver nu hämta ut varje värde från varje kolumn i raden:
+                int optionID = resultSet.getInt("Option_ID");
+                int bookingID = resultSet.getInt("Booking_ID");
+                String description = resultSet.getString("Description");
+                System.out.println("   " + optionID + "             " + bookingID + "          " + description);
+
+            }
+            return false;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return true;
+    }
+
+    public void updateOption(int updateOptionId, int optionId) {
+        String query = "UPDATE Option\n" +
+                "SET \n" +
+                "Option_ID = ?\n" +
+                "WHERE Option_ID = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, updateOptionId);
+            statement.setInt(2, optionId);
+            // commit to database
+            statement.executeUpdate();
+            String updateDescription = getOptionDescription(updateOptionId);
+            String description = getOptionDescription(optionId);
+            System.out.println("Option updated from: [" + description +"] to [" + updateDescription+"]\n");
+            // get result
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getOptionDescription(int optionId) {
+        String description;
+        String query = "SELECT * FROM Option_Info\n" +
+                "WHERE Option_Info.Option_ID = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, optionId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                // vi behöver nu hämta ut värde från kolumn i raden:
+                description = resultSet.getString("Description");
+                return description;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return "";
+    }
 }
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,7 @@
 package app;
 
 import dataconnection.DataService;
+import tableclasses.Customer;
 import tableclasses.Hotel;
 import tableclasses.Room;
 
@@ -12,7 +13,8 @@ public class AppUI {
         System.out.println(" -: Booking System :-\n ");
     }
     public void menuChoicePrint(){
-        System.out.println("\n1.Book hotel\n2.Delete Booking\n3.Informations Search\n4.Add Company(Customer) \n");
+        System.out.println("[1].Book Hotel\n[2].Delete Booking\n[3].Informations Search\n" +
+                "[4].Change Customer Infos\n[5].Add Company(Customer)\n[6].Edit Company\n[7].View/Add/Edit Booking's Options\n[8].Exit");
     }
 
     public void hotelAvailablePrint(ArrayList<Hotel> hotels, ArrayList<Room>rooms){
@@ -24,22 +26,23 @@ public class AppUI {
         }
     }
     public void searchCustomerChoicePrint(){
-        System.out.println("1.Search by customer ID\n2.Search by name \n3.Search by phone number\n4.Search by emails \n5.Return to main");
+        System.out.println("[1]Search by customer ID\n[2].Search by name \n[3].Search by phone number\n[4].Search by emails \n[5].Return to main display");
     }
     public void askRoomSizePrint(){
         System.out.println("Hotels has 3 room sizes. \n[2] [3] and [4]");
         System.out.println("Which room size does customer wants?");
     }
 
-    public void bookingCreatedMess(int customerId,int bookingId){
-        System.out.println("Congrats a booking with customer id: " + customerId + " Booking id: " + bookingId + " has been created.");
+    public void bookingCreatedMess(int customerId,int bookingId,ArrayList<Customer> customers){
+        String name = getCustomerNameById(customers,customerId);
+        System.out.println("Thank you "+ name + ",for booking. Here is Booking ID: "+ bookingId);
     }
     public void checkInDateText(){
-        System.out.println("Input check in date:");
+        System.out.println("Check in date ->:");
 
     }
     public void checkOutDateText(){
-        System.out.println("Input check out date:");
+        System.out.println("Check out date ->:");
 
     }
 public void calendarInputErrorMess(){
@@ -126,11 +129,65 @@ public String checkInAndOut(Scanner scanner){
     public String viewPriceQuery(String order){
         return "SELECT Hotel.Hotel_ID,Hotel.Hotel_Name,Room.Room_ID,Room.Room_Size,Room.Price FROM Hotel\n" +
                 "LEFT JOIN Room ON Room.Hotel_ID = Hotel.Hotel_ID\n" +
-                "WHERE Hotel.Hotel_ID = 3\n" +
+                "WHERE Hotel.Hotel_ID = ? \n" +
                 "ORDER BY Room.Price "+order+"";
     }
-    public void printHotelDistance(){
-
+    public String getCustomerNameById(ArrayList<Customer> customers, int customerId){
+        String name,firstName,lastName;
+        for (Customer customer: customers){
+            if (customer.customerID == customerId){
+                firstName = customer.firstName;
+                lastName = customer.lastName;
+                name = firstName + " " +lastName;
+                return name;
+            }
+        }
+        return "";
     }
 
+    public void searchCustomerMenuChoice(){
+        System.out.println("[1].Search by booking ID\n[2].Search by company infos \n[3].Search by customer infos\n[4].Return main display");
+    }
+    public void changeName(Scanner scanner,DataService dataService){
+        System.out.print("Customer ID ->: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        System.out.print("New first name: ");
+        String firstName = scanner.nextLine();
+        System.out.print("New last name: ");
+        String lastName = scanner.nextLine();
+        dataService.updateName(firstName,lastName,id);
+    }
+    public void changeAdress(Scanner scanner,DataService dataService){
+        System.out.print("Customer ID ->: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        System.out.print("New Adress: ");
+        String adress = scanner.nextLine();
+        System.out.print("New City: ");
+        String city = scanner.nextLine();
+        System.out.print("New Country: ");
+        String country = scanner.nextLine();
+        dataService.updateAdress(adress,city,country,id);
+
+    }
+    public void changePhoneOrEmail(Scanner scanner,DataService dataService,String co){
+        System.out.print("Customer ID ->: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        System.out.print("New "+co+": ");
+        String adress = scanner.nextLine();
+        dataService.updatePhoneNumbersOrEmail(co,adress,id);
+
+
+    }
+    public int getCustomerId(Scanner scanner){
+        System.out.print("[Delete] Customer ID ->: ");
+        return Integer.parseInt(scanner.nextLine());
+    }
+    public void optionsChoice(){
+        System.out.println("[1].Extra bed\n[2].Add 2 meals\n[3].Add 3 meals");
+    }
 }
+
+
+
+
+
