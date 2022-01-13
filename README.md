@@ -1,4 +1,4 @@
 # HotelBookingSystem
- A application creates with connection to sqlite database. This application has menu choices,search functions,edit functions andview functions connection direct to database.
+ A application creates to connect with sqlite database. This application has menu choices,search functions,edit functions andview functions with directly connection to database.
  
  Using: Java,JDBC,Sqlite
